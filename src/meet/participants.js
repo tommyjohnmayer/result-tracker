@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {
-  Button,
   DropdownButton,
   MenuItem,
   Modal,
