@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   Button,
   DropdownButton,
@@ -7,8 +7,8 @@ import {
   MenuItem,
   Modal,
   Panel
-} from "react-bootstrap";
-import { COMPETITOR } from "../App";
+} from 'react-bootstrap';
+import { COMPETITOR } from '../App';
 
 class Competitor extends Component {
   constructor(props) {
@@ -44,9 +44,9 @@ class Competitor extends Component {
   };
 
   render() {
-    const { competitor, deleteEntity } = this.props;
+    const { competitor } = this.props;
     const { editCompetitorModalVisible, updateCompetitor } = this.state;
-    document.title = "Live Result Tracker";
+    document.title = 'Live Result Tracker';
     return (
       <Panel>
         <Panel.Heading>
@@ -63,13 +63,6 @@ class Competitor extends Component {
                 eventKey="edit"
               >
                 edit
-              </MenuItem>
-              <MenuItem divider />
-              <MenuItem
-                onSelect={() => deleteEntity(COMPETITOR, competitor.id)}
-                eventKey="delete"
-              >
-                delete
               </MenuItem>
             </DropdownButton>
           </Panel.Title>

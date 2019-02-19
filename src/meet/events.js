@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   Badge,
   Button,
@@ -6,14 +6,14 @@ import {
   ListGroup,
   ListGroupItem,
   Panel
-} from "react-bootstrap";
-import { EVENT, MEET } from "../App";
+} from 'react-bootstrap';
+import { EVENT, MEET } from '../App';
 
 class Events extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      newEvent: { name: "" }
+      newEvent: { name: '' }
     };
   }
 
@@ -30,10 +30,10 @@ class Events extends Component {
     event.preventDefault();
     const { addEntity, selected } = this.props;
     const { newEvent } = this.state;
-    if (newEvent.name.trim() !== "") {
+    if (newEvent.name.trim() !== '') {
       addEntity(EVENT, { ...newEvent, meet: selected.meet });
       this.setState({
-        newEvent: { name: "" }
+        newEvent: { name: '' }
       });
     }
   };
@@ -49,7 +49,7 @@ class Events extends Component {
 
   render() {
     const { newEvent } = this.state;
-    const { events, selected, participants } = this.props;
+    const { events, selected } = this.props;
     return (
       <Panel defaultExpanded>
         <Panel.Heading>
@@ -57,22 +57,16 @@ class Events extends Component {
         </Panel.Heading>
         <Panel.Collapse>
           <ListGroup>
-            {Object.keys(events).map(key => (
+            {events.map(event => (
               <ListGroupItem
-                key={key}
-                onClick={() => this.selectEvent(key)}
-                active={selected.event === key}
+                key={event.id}
+                onClick={() => this.selectEvent(event.id)}
+                active={selected.event === event.id}
               >
                 <h4 className="list-group-item-heading">
-                  {events[key].name}
+                  {event.name}
                   &nbsp;
-                  <Badge>
-                    {
-                      Object.keys(participants).filter(
-                        pkey => participants[pkey].event === key
-                      ).length
-                    }
-                  </Badge>
+                  <Badge>{event.participants.length}</Badge>
                 </h4>
               </ListGroupItem>
             ))}

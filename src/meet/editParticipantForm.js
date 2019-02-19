@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import { Button, Form, FormControl } from "react-bootstrap";
-import { RESULT, PARTICIPANT } from "../App";
+import React, { Component } from 'react';
+import { Button, Form, FormControl } from 'react-bootstrap';
+import { PARTICIPANT } from '../App';
 
 class EditParticipantForm extends Component {
   constructor(props) {
@@ -21,16 +21,9 @@ class EditParticipantForm extends Component {
 
   editParticipant = event => {
     event.preventDefault();
-    const { results, editEntity } = this.props;
+    const { editEntity } = this.props;
     const { updatedParticipant } = this.state;
     editEntity(PARTICIPANT, updatedParticipant);
-    Object.keys(results)
-      .map(key => results[key])
-      .filter(result => result.participant === updatedParticipant.id)
-      .forEach(result => {
-        result.division = updatedParticipant.division;
-        editEntity(RESULT, result);
-      });
   };
 
   render() {
@@ -38,7 +31,9 @@ class EditParticipantForm extends Component {
     const { updatedParticipant } = this.state;
     return (
       <tr>
-        <td>{events[participant.event].name}</td>
+        <td>
+          {events.filter(event => event.id === participant.event)[0].name}
+        </td>
         <td>
           <Form onSubmit={this.editParticipant} inline>
             <FormControl
@@ -46,7 +41,7 @@ class EditParticipantForm extends Component {
               value={updatedParticipant.division}
               name="division"
               data-object="updatedParticipant"
-              placeholder="00:00.00"
+              placeholder="enter division"
               onChange={this.handleChange}
               autoComplete="off"
             />

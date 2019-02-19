@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   Button,
   DropdownButton,
@@ -8,10 +8,10 @@ import {
   Modal,
   Panel,
   Table
-} from "react-bootstrap";
-import { EVENT, PARTICIPANT, RESULT } from "../App";
-import moment from "moment";
-import RunOrderModal from "./runOrderModal";
+} from 'react-bootstrap';
+import { EVENT, PARTICIPANT, RESULT } from '../App';
+import moment from 'moment';
+import RunOrderModal from './runOrderModal';
 import AddResultForm from './addResultForm';
 
 class Participants extends Component {
@@ -62,30 +62,12 @@ class Participants extends Component {
   };
 
   render() {
-    const {
-      participants,
-      selected,
-      competitors,
-      results,
-      addEntity,
-      deleteEntity,
-      event
-    } = this.props;
+    const { competitors, addEntity, deleteEntity, event } = this.props;
     const {
       editEventModalVisible,
       editRunOrderModalVisible,
       updateEvent
     } = this.state;
-    const participantArray = Object.keys(participants)
-      .map(key => participants[key])
-      .filter(
-        participant => participant.event === selected.event || !selected.event
-      )
-      .sort((a, b) => a.order - b.order);
-    const participantForSelectedEventByOrder = Object.keys(participants)
-      .filter(key => participants[key].event === selected.event)
-      .map(key => participants[key])
-      .sort((a, b) => a.order - b.order);
     return (
       <Panel defaultExpanded>
         <Panel.Heading>
@@ -112,7 +94,7 @@ class Participants extends Component {
               </MenuItem>
               <MenuItem divider />
               <MenuItem
-                onSelect={() => deleteEntity(EVENT, event.id)}
+                onSelect={() => deleteEntity(EVENT, event)}
                 eventKey="delete"
               >
                 delete {event.name}
@@ -122,62 +104,67 @@ class Participants extends Component {
         </Panel.Heading>
         <Table condensed>
           <tbody>
-            {participantArray.map(participant => (
-              <tr key={participant.id}>
-                <td>
-                  <DropdownButton
-                    bsStyle="link"
-                    id="meet-menu"
-                    title={competitors[participant.competitor].name}
-                  >
-                    <MenuItem
-                      eventKey="withdraw"
-                      onSelect={() => deleteEntity(PARTICIPANT, participant.id)}
+            {event.participants
+              .sort((a, b) => a.order - b.order)
+              .map(participant => (
+                <tr key={participant.id}>
+                  <td>
+                    <DropdownButton
+                      bsStyle="link"
+                      id="meet-menu"
+                      title={competitors[participant.competitor].name}
                     >
-                      Withdraw from {event.name}
-                    </MenuItem>
-                  </DropdownButton>
-                </td>
-                <td>{participant.division}</td>
-                <td>
-                  <AddResultForm
-                    addEntity={addEntity}
-                    participant={participant}
-                  />
-                </td>
-                {Object.keys(results)
-                  .map(key => results[key])
-                  .filter(result => result.participant === participant.id)
-                  .map(result => (
-                    <td key={result.id}>
-                      <DropdownButton
-                        bsStyle="link"
-                        id="meet-menu"
-                        title={
-                          result.time.asMinutes() > 1
-                            ? moment
-                                .utc(result.time.as("milliseconds"))
-                                .format("m:ss.SS")
-                            : result.time.asSeconds()
-                        }
+                      <MenuItem
+                        eventKey="withdraw"
+                        onSelect={() => deleteEntity(PARTICIPANT, participant)}
                       >
-                        <MenuItem
-                          onSelect={() => deleteEntity(RESULT, result.id)}
-                          eventKey="delete"
-                        >
-                          delete
-                        </MenuItem>
-                      </DropdownButton>
-                    </td>
-                  ))}
-              </tr>
-            ))}
+                        Withdraw from {event.name}
+                      </MenuItem>
+                    </DropdownButton>
+                  </td>
+                  <td>{participant.division}</td>
+                  <td>
+                    <AddResultForm
+                      addEntity={addEntity}
+                      participant={participant}
+                    />
+                  </td>
+                  {participant.results
+                    ? participant.results.map(result => (
+                        <td key={result.id}>
+                          <DropdownButton
+                            bsStyle="link"
+                            id="meet-menu"
+                            title={
+                              moment.duration(result.time).asMinutes() > 1
+                                ? moment
+                                    .utc(
+                                      moment
+                                        .duration(result.time)
+                                        .as('milliseconds')
+                                    )
+                                    .format('m:ss.SS')
+                                : moment.duration(result.time).asSeconds()
+                            }
+                          >
+                            <MenuItem
+                              onSelect={() => deleteEntity(RESULT, result)}
+                              eventKey="delete"
+                            >
+                              delete
+                            </MenuItem>
+                          </DropdownButton>
+                        </td>
+                      ))
+                    : null}
+                </tr>
+              ))}
           </tbody>
         </Table>
         <RunOrderModal
           show={editRunOrderModalVisible}
           hide={this.showRunOrderModal}
-          participants={participantForSelectedEventByOrder}
+          participants={event.participants}
           competitors={competitors}
           editParticipant={this.editParticipant}
         />
