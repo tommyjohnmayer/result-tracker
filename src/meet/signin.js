@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   Button,
   Checkbox,
@@ -7,23 +7,23 @@ import {
   ListGroup,
   ListGroupItem,
   Panel
-} from "react-bootstrap";
-import { PARTICIPANT } from "../App";
+} from 'react-bootstrap';
+import { PARTICIPANT } from '../App';
 
 class Signin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      newParticipantCompetitor: 0,
-      newParticipantDivision: "",
+      newParticipantCompetitor: '',
+      newParticipantDivision: '',
       newParticipantEvents: []
     };
   }
 
   clearSignin = () => {
     this.setState({
-      newParticipantCompetitor: 0,
-      newParticipantDivision: ""
+      newParticipantCompetitor: '',
+      newParticipantDivision: ''
     });
   };
 
@@ -79,18 +79,24 @@ class Signin extends Component {
       updatedEvents = updatedEvents.filter(id => id !== data.id);
     }
     this.setState({
-      newParticipantEvents: updatedEvents.filter(ev =>
-        Object.keys(events).includes(ev)
+      newParticipantEvents: updatedEvents.filter(
+        ev => events.filter(event => event.id === ev).length > 0
       )
     });
   };
 
   render() {
-    const { events, participants, competitors } = this.props;
+    const { events, competitors } = this.props;
+    const registeredCompetitorKeys = events.reduce((acc, event) => {
+      acc.push(
+        ...event.participants.map(participant => participant.competitor)
+      );
+      return acc;
+    }, []);
     const { newParticipantDivision } = this.state;
-    const registeredCompetitorKeys = Object.keys(participants).map(
-      key => participants[key].competitor
-    );
+    // const registeredCompetitorKeys = Object.keys(participants).map(
+    //   key => participants[key].competitor
+    // );
     const unregisteredCompetitors = Object.keys(competitors)
       .filter(key => !registeredCompetitorKeys.includes(key))
       .map(key => competitors[key]);

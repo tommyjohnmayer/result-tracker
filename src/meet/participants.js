@@ -1,15 +1,9 @@
-import React, { Component } from "react";
-import {
-  DropdownButton,
-  MenuItem,
-  Modal,
-  Panel,
-  Table
-} from "react-bootstrap";
-import { PARTICIPANT, RESULT } from "../App";
-import moment from "moment";
-import AddResultForm from "./addResultForm";
-import EditParticipantForm from "./editParticipantForm";
+import React, { Component } from 'react';
+import { DropdownButton, MenuItem, Modal, Panel, Table } from 'react-bootstrap';
+import { PARTICIPANT, RESULT } from '../App';
+import moment from 'moment';
+import AddResultForm from './addResultForm';
+import EditParticipantForm from './editParticipantForm';
 
 class Participants extends Component {
   constructor(props) {
@@ -21,10 +15,13 @@ class Participants extends Component {
   }
 
   showEditParticipantsModal = (show, competitor) => {
-    const { participants } = this.props;
+    const { events } = this.props;
     this.setState(prevState => {
-      const participantsToEdit = Object.keys(participants)
-        .map(key => participants[key])
+      const participantsToEdit = events
+        .reduce((acc, event) => {
+          acc = [...acc, ...event.participants];
+          return acc;
+        }, [])
         .filter(participant => participant.competitor === competitor);
       return {
         editParticipantsModalVisible: show,
@@ -35,21 +32,22 @@ class Participants extends Component {
 
   render() {
     const {
-      selected,
       deleteEntity,
       addEntity,
       events,
-      participants,
       competitors,
-      results,
       editEntity
     } = this.props;
+    const participants = events.reduce((acc, event) => {
+      acc = [...acc, ...event.participants];
+      return acc;
+    }, []);
     const { editParticipantsModalVisible, participantsToEdit } = this.state;
-    const participantsByCompetitor = Object.keys(participants)
-      .filter(
-        key => participants[key].event === selected.event || !selected.event
-      )
-      .map(key => participants[key])
+    const participantsByCompetitor = events
+      .reduce((acc, event) => {
+        acc = [...acc, ...event.participants];
+        return acc;
+      }, [])
       .reduce((acc, participant) => {
         if (!acc[participant.competitor]) {
           const competitor = competitors[participant.competitor];
@@ -58,11 +56,9 @@ class Participants extends Component {
             participants: []
           };
         }
-        participant.event_name = events[participant.event].name;
-        participant.results = Object.keys(results)
-          .filter(key => results[key].participant === participant.id)
-          .filter(key => results[key].event === participant.event)
-          .map(key => results[key]);
+        participant.event_name = events.filter(
+          event => event.id === participant.event
+        )[0].name;
         acc[participant.competitor].participants.push(participant);
         return acc;
       }, {});
@@ -97,18 +93,12 @@ class Participants extends Component {
                                   >
                                     Edit
                                   </MenuItem>
-                                  {Object.keys(events)
-                                    .map(key => events[key])
+                                  {events
                                     .filter(
                                       event =>
-                                        !Object.keys(participants)
-                                          .map(key => participants[key])
-                                          .filter(
-                                            participant =>
-                                              participant.competitor === key
-                                          )
-                                          .map(participant => participant.event)
-                                          .includes(event.id)
+                                        !event.participants
+                                          .map(p => p.competitor)
+                                          .includes(participant.competitor)
                                     )
                                     .map(event => (
                                       <MenuItem
@@ -118,7 +108,7 @@ class Participants extends Component {
                                           addEntity(PARTICIPANT, {
                                             competitor: key,
                                             event: event.id,
-                                            meet: selected.meet,
+                                            meet: event.meet,
                                             division:
                                               participantsByCompetitor[key]
                                                 .division
@@ -129,8 +119,7 @@ class Participants extends Component {
                                       </MenuItem>
                                     ))}
                                   <MenuItem divider />
-                                  {Object.keys(participants)
-                                    .map(key => participants[key])
+                                  {participants
                                     .filter(
                                       participant =>
                                         participant.competitor === key
@@ -140,10 +129,7 @@ class Participants extends Component {
                                         key={participant.id}
                                         eventKey={participant.id}
                                         onSelect={() =>
-                                          deleteEntity(
-                                            PARTICIPANT,
-                                            participant.id
-                                          )
+                                          deleteEntity(PARTICIPANT, participant)
                                         }
                                       >
                                         withdraw from {participant.event_name}
@@ -160,7 +146,7 @@ class Participants extends Component {
                               <td />
                             </React.Fragment>
                           )}
-                          {!selected.event && <td>{participant.event_name}</td>}
+                          {<td>{participant.event_name}</td>}
                           <td>
                             <AddResultForm
                               addEntity={addEntity}
@@ -173,17 +159,19 @@ class Participants extends Component {
                                 bsStyle="link"
                                 id="meet-menu"
                                 title={
-                                  result.time.asMinutes() > 1
+                                  moment.duration(result.time).asMinutes() > 1
                                     ? moment
-                                        .utc(result.time.as("milliseconds"))
-                                        .format("m:ss.SS")
-                                    : result.time.asSeconds()
+                                        .utc(
+                                          moment
+                                            .duration(result.time)
+                                            .as('milliseconds')
+                                        )
+                                        .format('m:ss.SS')
+                                    : moment.duration(result.time).asSeconds()
                                 }
                               >
                                 <MenuItem
-                                  onSelect={() =>
-                                    deleteEntity(RESULT, result.id)
-                                  }
+                                  onSelect={() => deleteEntity(RESULT, result)}
                                   eventKey="1"
                                 >
                                   delete
@@ -211,10 +199,10 @@ class Participants extends Component {
                 <tbody>
                   {participantsToEdit.map(participant => (
                     <EditParticipantForm
+                      key={participant.id}
                       participant={participant}
                       events={events}
                       editEntity={editEntity}
-                      results={results}
                     />
                   ))}
                 </tbody>
