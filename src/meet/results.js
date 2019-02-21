@@ -36,16 +36,16 @@ class Results extends Component {
                     <Table>
                       {Object.keys(event.divisions)
                         .map(key => event.divisions[key])
-                        .map(division => {
+                        .map(results => {
                           return (
-                            <React.Fragment key={division}>
+                            <React.Fragment key={results[0].division}>
                               <thead>
                                 <tr>
-                                  <th>{division}</th>
+                                  <th>{results[0].division}</th>
                                   <th>total</th>
                                 </tr>
                               </thead>
-                              {division
+                              {results
                                 .sort(
                                   (a, b) =>
                                     moment
