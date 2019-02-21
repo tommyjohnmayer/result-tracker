@@ -1,18 +1,18 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   Button,
   FormControl,
   ListGroup,
   ListGroupItem,
   Panel
-} from "react-bootstrap";
-import { MEET } from "../App";
+} from 'react-bootstrap';
+import { MEET } from '../App';
 
 class Meets extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      newEntity: { name: "", date: "" }
+      newEntity: { name: '', date: '' }
     };
   }
 
@@ -29,11 +29,11 @@ class Meets extends Component {
     event.preventDefault();
     const { addEntity, selectEntity } = this.props;
     const { newEntity } = this.state;
-    if (newEntity.name.trim() !== "") {
+    if (newEntity.name.trim() !== '') {
       const meetId = addEntity(MEET, newEntity);
       selectEntity(MEET, meetId);
       this.setState({
-        newEntity: { name: "", date: "" }
+        newEntity: { name: '', date: '' }
       });
     }
   };
@@ -48,19 +48,6 @@ class Meets extends Component {
         </Panel.Heading>
         <Panel.Collapse>
           <ListGroup>
-            {Object.keys(meets)
-              .map(key => meets[key])
-              .map(meet => (
-                <ListGroupItem
-                  className="meet-selector"
-                  key={meet.id}
-                  header={meet.name}
-                  onClick={() => selectEntity(MEET, meet.id)}
-                  active={selected.meet === meet.id}
-                >
-                  {meet.date}
-                </ListGroupItem>
-              ))}
             <ListGroupItem>
               <form className="new-meet" onSubmit={this.addMeet}>
                 <FormControl
@@ -92,6 +79,19 @@ class Meets extends Component {
                 </Button>
               </form>
             </ListGroupItem>
+            {Object.keys(meets)
+              .map(key => meets[key])
+              .map(meet => (
+                <ListGroupItem
+                  className="meet-selector"
+                  key={meet.id}
+                  header={meet.name}
+                  onClick={() => selectEntity(MEET, meet.id)}
+                  active={selected.meet === meet.id}
+                >
+                  {meet.date}
+                </ListGroupItem>
+              ))}
           </ListGroup>
         </Panel.Collapse>
       </Panel>

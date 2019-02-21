@@ -99,7 +99,8 @@ class Signin extends Component {
     // );
     const unregisteredCompetitors = Object.keys(competitors)
       .filter(key => !registeredCompetitorKeys.includes(key))
-      .map(key => competitors[key]);
+      .map(key => competitors[key])
+      .sort((a, b) => a.name.localeCompare(b.name));
     return (
       <Panel defaultExpanded>
         <Panel.Heading>

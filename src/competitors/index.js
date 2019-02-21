@@ -1,18 +1,18 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   Button,
   FormControl,
   ListGroup,
   ListGroupItem,
   Panel
-} from "react-bootstrap";
-import { COMPETITOR } from "../App";
+} from 'react-bootstrap';
+import { COMPETITOR } from '../App';
 
 class Competitors extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      newCompetitor: { name: "", division: "" }
+      newCompetitor: { name: '', division: '' }
     };
   }
 
@@ -29,10 +29,10 @@ class Competitors extends Component {
     event.preventDefault();
     const { addEntity } = this.props;
     const { newCompetitor } = this.state;
-    if (newCompetitor.name.trim() !== "") {
+    if (newCompetitor.name.trim() !== '') {
       addEntity(COMPETITOR, newCompetitor);
       this.setState({
-        newCompetitor: { name: "", division: "" }
+        newCompetitor: { name: '', division: '' }
       });
     }
   };
@@ -47,17 +47,6 @@ class Competitors extends Component {
         </Panel.Heading>
         <Panel.Collapse>
           <ListGroup>
-            {Object.keys(competitors)
-              .map(key => competitors[key])
-              .map(competitor => (
-                <ListGroupItem
-                  className="competitor-selector"
-                  onClick={() => selectEntity(COMPETITOR, competitor.id)}
-                  active={selected.competitor === competitor.id}
-                  header={competitor.name}
-                  key={competitor.id}
-                />
-              ))}
             <ListGroupItem>
               <form className="new-competitor" onSubmit={this.addCompetitor}>
                 <FormControl
@@ -89,6 +78,18 @@ class Competitors extends Component {
                 </Button>
               </form>
             </ListGroupItem>
+            {Object.keys(competitors)
+              .map(key => competitors[key])
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map(competitor => (
+                <ListGroupItem
+                  className="competitor-selector"
+                  onClick={() => selectEntity(COMPETITOR, competitor.id)}
+                  active={selected.competitor === competitor.id}
+                  header={competitor.name}
+                  key={competitor.id}
+                />
+              ))}
           </ListGroup>
         </Panel.Collapse>
       </Panel>
