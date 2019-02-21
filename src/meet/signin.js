@@ -9,6 +9,7 @@ import {
   Panel
 } from 'react-bootstrap';
 import { PARTICIPANT } from '../App';
+import { Typeahead } from 'react-bootstrap-typeahead';
 
 class Signin extends Component {
   constructor(props) {
@@ -16,14 +17,29 @@ class Signin extends Component {
     this.state = {
       newParticipantCompetitor: '',
       newParticipantDivision: '',
-      newParticipantEvents: []
+      newParticipantEvents: [],
+      selectedCompetitor: []
     };
   }
+
+  typeAhead = value => {
+    const competitor = value[0];
+    if (competitor) {
+      this.setState({
+        newParticipantCompetitor: competitor.id,
+        newParticipantDivision: competitor.division,
+        selectedCompetitor: [value[0]]
+      });
+    } else {
+      this.clearSignin();
+    }
+  };
 
   clearSignin = () => {
     this.setState({
       newParticipantCompetitor: '',
-      newParticipantDivision: ''
+      newParticipantDivision: '',
+      selectedCompetitor: []
     });
   };
 
@@ -57,19 +73,6 @@ class Signin extends Component {
     }
   };
 
-  enterNewParticipantCompetitor = event => {
-    const { competitors } = this.props;
-    const competitor = competitors[event.target.value];
-    if (competitor) {
-      this.setState({
-        newParticipantCompetitor: competitor.id,
-        newParticipantDivision: competitor.division
-      });
-    } else {
-      this.clearSignin();
-    }
-  };
-
   toggleEvent = (event, data) => {
     const { events } = this.props;
     let updatedEvents = this.state.newParticipantEvents;
@@ -93,7 +96,11 @@ class Signin extends Component {
       );
       return acc;
     }, []);
-    const { newParticipantDivision } = this.state;
+    const {
+      newParticipantDivision,
+      newParticipantCompetitor,
+      selectedCompetitor
+    } = this.state;
     // const registeredCompetitorKeys = Object.keys(participants).map(
     //   key => participants[key].competitor
     // );
@@ -110,24 +117,13 @@ class Signin extends Component {
           <ListGroup>
             <ListGroupItem>
               <form onSubmit={this.addParticipant}>
-                <FormControl
-                  componentClass="select"
-                  placeholder="select competitor"
-                  onChange={this.enterNewParticipantCompetitor}
-                >
-                  <option key="0" value="0">
-                    Add...
-                  </option>
-                  {unregisteredCompetitors.map(competitor => (
-                    <option
-                      key={competitor.id}
-                      id={competitor.id}
-                      value={competitor.id}
-                    >
-                      {competitor.name}
-                    </option>
-                  ))}
-                </FormControl>
+                <Typeahead
+                  labelKey="name"
+                  options={unregisteredCompetitors}
+                  placeholder="select competitor..."
+                  onChange={this.typeAhead}
+                  selected={selectedCompetitor}
+                />
                 <FormControl
                   type="text"
                   value={newParticipantDivision}
