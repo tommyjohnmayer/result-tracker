@@ -69,6 +69,23 @@ class App extends Component {
     });
   }
 
+  getEntity = (type, entity) => {
+    switch (type) {
+      case MEET:
+        fetch(api_url + '/meets/' + entity.id)
+          .then(res => res.json())
+          .then(meet => {
+            this.setState(prevState => ({
+              meets: { ...prevState.meets, [meet.id]: meet }
+            }));
+          });
+        break;
+      default:
+        console.log('operation not supported get', type, entity);
+        break;
+    }
+  };
+
   deleteEntity = (type, entity) => {
     switch (type) {
       case MEET:
@@ -543,6 +560,7 @@ class App extends Component {
                 deleteEntity={this.deleteEntity}
                 editEntity={this.editEntity}
                 edit={edit}
+                getEntity={this.getEntity}
               />
             )}
             {selected.competitor && (

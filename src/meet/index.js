@@ -59,7 +59,8 @@ class Meet extends Component {
       selected,
       editEntity,
       addEntity,
-      edit
+      edit,
+      getEntity
     } = this.props;
     const { events } = meet;
     document.title = meet.name;
@@ -94,6 +95,10 @@ class Meet extends Component {
                 </MenuItem>
               </DropdownButton>
             )}
+            &nbsp;
+            <Button bsStyle="default" onClick={() => getEntity(MEET, meet)}>
+              <Glyphicon glyph="refresh" />
+            </Button>
           </Panel.Title>
         </Panel.Heading>
         <Panel.Body>
@@ -136,7 +141,11 @@ class Meet extends Component {
                   edit={edit}
                 />
               )}
-              <Results events={events} competitors={competitors} />
+              <Results
+                competitors={competitors}
+                getEntity={getEntity}
+                meet={meet}
+              />
             </Col>
           </Row>
         </Panel.Body>
