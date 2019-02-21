@@ -62,7 +62,7 @@ class Participants extends Component {
   };
 
   render() {
-    const { competitors, addEntity, deleteEntity, event } = this.props;
+    const { competitors, addEntity, deleteEntity, event, edit } = this.props;
     const {
       editEventModalVisible,
       editRunOrderModalVisible,
@@ -73,33 +73,35 @@ class Participants extends Component {
         <Panel.Heading>
           <Panel.Title>
             {event.name}
-            <DropdownButton
-              bsStyle="link"
-              id="meet-menu"
-              noCaret
-              title={<Glyphicon glyph="menu-hamburger" />}
-            >
-              <MenuItem
-                eventKey="order"
-                onSelect={() => this.showRunOrderModal(true)}
+            {edit && (
+              <DropdownButton
+                bsStyle="link"
+                id="meet-menu"
+                noCaret
+                title={<Glyphicon glyph="menu-hamburger" />}
               >
-                set run order
-              </MenuItem>
-              <MenuItem divider />
-              <MenuItem
-                eventKey="edit"
-                onSelect={() => this.showEditEventModal(true)}
-              >
-                edit {event.name}
-              </MenuItem>
-              <MenuItem divider />
-              <MenuItem
-                onSelect={() => deleteEntity(EVENT, event)}
-                eventKey="delete"
-              >
-                delete {event.name}
-              </MenuItem>
-            </DropdownButton>
+                <MenuItem
+                  eventKey="order"
+                  onSelect={() => this.showRunOrderModal(true)}
+                >
+                  set run order
+                </MenuItem>
+                <MenuItem divider />
+                <MenuItem
+                  eventKey="edit"
+                  onSelect={() => this.showEditEventModal(true)}
+                >
+                  edit {event.name}
+                </MenuItem>
+                <MenuItem divider />
+                <MenuItem
+                  onSelect={() => deleteEntity(EVENT, event)}
+                  eventKey="delete"
+                >
+                  delete {event.name}
+                </MenuItem>
+              </DropdownButton>
+            )}
           </Panel.Title>
         </Panel.Heading>
         <Table condensed>
@@ -114,21 +116,27 @@ class Participants extends Component {
                       id="meet-menu"
                       title={competitors[participant.competitor].name}
                     >
-                      <MenuItem
-                        eventKey="withdraw"
-                        onSelect={() => deleteEntity(PARTICIPANT, participant)}
-                      >
-                        Withdraw from {event.name}
-                      </MenuItem>
+                      {edit && (
+                        <MenuItem
+                          eventKey="withdraw"
+                          onSelect={() =>
+                            deleteEntity(PARTICIPANT, participant)
+                          }
+                        >
+                          Withdraw from {event.name}
+                        </MenuItem>
+                      )}
                     </DropdownButton>
                   </td>
                   <td>{participant.division}</td>
-                  <td>
-                    <AddResultForm
-                      addEntity={addEntity}
-                      participant={participant}
-                    />
-                  </td>
+                  {edit && (
+                    <td>
+                      <AddResultForm
+                        addEntity={addEntity}
+                        participant={participant}
+                      />
+                    </td>
+                  )}
                   {participant.results
                     ? participant.results.map(result => (
                         <td key={result.id}>
@@ -147,12 +155,14 @@ class Participants extends Component {
                                 : moment.duration(result.time).asSeconds()
                             }
                           >
-                            <MenuItem
-                              onSelect={() => deleteEntity(RESULT, result)}
-                              eventKey="delete"
-                            >
-                              delete
-                            </MenuItem>
+                            {edit && (
+                              <MenuItem
+                                onSelect={() => deleteEntity(RESULT, result)}
+                                eventKey="delete"
+                              >
+                                delete
+                              </MenuItem>
+                            )}
                           </DropdownButton>
                         </td>
                       ))

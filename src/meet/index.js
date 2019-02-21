@@ -58,7 +58,8 @@ class Meet extends Component {
       selectEntity,
       selected,
       editEntity,
-      addEntity
+      addEntity,
+      edit
     } = this.props;
     const { events } = meet;
     document.title = meet.name;
@@ -71,42 +72,47 @@ class Meet extends Component {
         <Panel.Heading>
           <Panel.Title>
             {meet.name}
-            <DropdownButton
-              bsStyle="link"
-              id="meet-menu"
-              noCaret
-              title={<Glyphicon glyph="menu-hamburger" />}
-            >
-              <MenuItem
-                onSelect={() => this.showEditMeetModal(true)}
-                eventKey="edit"
+            {edit && (
+              <DropdownButton
+                bsStyle="link"
+                id="meet-menu"
+                noCaret
+                title={<Glyphicon glyph="menu-hamburger" />}
               >
-                edit
-              </MenuItem>
-              <MenuItem divider />
-              <MenuItem
-                onSelect={() => deleteEntity(MEET, meet)}
-                eventKey="delete"
-              >
-                delete
-              </MenuItem>
-            </DropdownButton>
+                <MenuItem
+                  onSelect={() => this.showEditMeetModal(true)}
+                  eventKey="edit"
+                >
+                  edit
+                </MenuItem>
+                <MenuItem divider />
+                <MenuItem
+                  onSelect={() => deleteEntity(MEET, meet)}
+                  eventKey="delete"
+                >
+                  delete
+                </MenuItem>
+              </DropdownButton>
+            )}
           </Panel.Title>
         </Panel.Heading>
         <Panel.Body>
           <Row>
             <Col sm={3}>
-              <Signin
-                events={events}
-                addEntity={addEntity}
-                selected={selected}
-                competitors={competitors}
-              />
+              {edit && (
+                <Signin
+                  events={events}
+                  addEntity={addEntity}
+                  selected={selected}
+                  competitors={competitors}
+                />
+              )}
               <Events
                 events={events}
                 selectEntity={selectEntity}
                 selected={selected}
                 addEntity={addEntity}
+                edit={edit}
               />
             </Col>
             <Col sm={9}>
@@ -117,6 +123,7 @@ class Meet extends Component {
                   deleteEntity={deleteEntity}
                   editEntity={editEntity}
                   event={selectedEvent}
+                  edit={edit}
                 />
               )}
               {!selected.event && (
@@ -126,6 +133,7 @@ class Meet extends Component {
                   editEntity={editEntity}
                   events={events}
                   competitors={competitors}
+                  edit={edit}
                 />
               )}
               <Results events={events} competitors={competitors} />

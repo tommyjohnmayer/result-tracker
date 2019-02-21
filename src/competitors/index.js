@@ -38,7 +38,7 @@ class Competitors extends Component {
   };
 
   render() {
-    const { competitors, selected, selectEntity } = this.props;
+    const { competitors, selected, selectEntity, edit } = this.props;
     const { newCompetitor } = this.state;
     return (
       <Panel defaultExpanded>
@@ -47,37 +47,39 @@ class Competitors extends Component {
         </Panel.Heading>
         <Panel.Collapse>
           <ListGroup>
-            <ListGroupItem>
-              <form className="new-competitor" onSubmit={this.addCompetitor}>
-                <FormControl
-                  className="new-competitor-name"
-                  type="text"
-                  value={newCompetitor.name}
-                  name="name"
-                  placeholder="Enter New Competitor"
-                  onChange={this.handleChange}
-                  data-object="newCompetitor"
-                  autoComplete="off"
-                />
-                <FormControl
-                  className="new-competitor-division"
-                  type="text"
-                  value={newCompetitor.division}
-                  name="division"
-                  placeholder="Enter Division"
-                  onChange={this.handleChange}
-                  data-object="newCompetitor"
-                  autoComplete="off"
-                />
-                <Button
-                  bsStyle="primary"
-                  type="submit"
-                  className="new-competitor-submit"
-                >
-                  add competitor
-                </Button>
-              </form>
-            </ListGroupItem>
+            {edit && (
+              <ListGroupItem>
+                <form className="new-competitor" onSubmit={this.addCompetitor}>
+                  <FormControl
+                    className="new-competitor-name"
+                    type="text"
+                    value={newCompetitor.name}
+                    name="name"
+                    placeholder="Enter New Competitor"
+                    onChange={this.handleChange}
+                    data-object="newCompetitor"
+                    autoComplete="off"
+                  />
+                  <FormControl
+                    className="new-competitor-division"
+                    type="text"
+                    value={newCompetitor.division}
+                    name="division"
+                    placeholder="Enter Division"
+                    onChange={this.handleChange}
+                    data-object="newCompetitor"
+                    autoComplete="off"
+                  />
+                  <Button
+                    bsStyle="primary"
+                    type="submit"
+                    className="new-competitor-submit"
+                  >
+                    add competitor
+                  </Button>
+                </form>
+              </ListGroupItem>
+            )}
             {Object.keys(competitors)
               .map(key => competitors[key])
               .sort((a, b) => a.name.localeCompare(b.name))

@@ -49,7 +49,7 @@ class Events extends Component {
 
   render() {
     const { newEvent } = this.state;
-    const { events, selected } = this.props;
+    const { events, selected, edit } = this.props;
     return (
       <Panel defaultExpanded>
         <Panel.Heading>
@@ -70,23 +70,25 @@ class Events extends Component {
                 </h4>
               </ListGroupItem>
             ))}
-            <ListGroupItem>
-              <form onSubmit={this.addEvent}>
-                <FormControl
-                  type="text"
-                  value={newEvent.name}
-                  name="name"
-                  data-object="newEvent"
-                  placeholder="Enter Event"
-                  onChange={this.handleChange}
-                  autoComplete="off"
-                />
+            {edit && (
+              <ListGroupItem>
+                <form onSubmit={this.addEvent}>
+                  <FormControl
+                    type="text"
+                    value={newEvent.name}
+                    name="name"
+                    data-object="newEvent"
+                    placeholder="Enter Event"
+                    onChange={this.handleChange}
+                    autoComplete="off"
+                  />
 
-                <Button bsStyle="primary" type="submit">
-                  add event
-                </Button>
-              </form>
-            </ListGroupItem>
+                  <Button bsStyle="primary" type="submit">
+                    add event
+                  </Button>
+                </form>
+              </ListGroupItem>
+            )}
           </ListGroup>
         </Panel.Collapse>
       </Panel>

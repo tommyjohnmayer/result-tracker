@@ -44,7 +44,7 @@ class Competitor extends Component {
   };
 
   render() {
-    const { competitor } = this.props;
+    const { competitor, edit } = this.props;
     const { editCompetitorModalVisible, updateCompetitor } = this.state;
     document.title = 'Live Result Tracker';
     return (
@@ -52,19 +52,21 @@ class Competitor extends Component {
         <Panel.Heading>
           <Panel.Title>
             {competitor.name}
-            <DropdownButton
-              bsStyle="link"
-              id="meet-menu"
-              noCaret
-              title={<Glyphicon glyph="menu-hamburger" />}
-            >
-              <MenuItem
-                onSelect={() => this.showEditModal(true)}
-                eventKey="edit"
+            {edit && (
+              <DropdownButton
+                bsStyle="link"
+                id="meet-menu"
+                noCaret
+                title={<Glyphicon glyph="menu-hamburger" />}
               >
-                edit
-              </MenuItem>
-            </DropdownButton>
+                <MenuItem
+                  onSelect={() => this.showEditModal(true)}
+                  eventKey="edit"
+                >
+                  edit
+                </MenuItem>
+              </DropdownButton>
+            )}
           </Panel.Title>
         </Panel.Heading>
         <Modal

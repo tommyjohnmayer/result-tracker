@@ -39,7 +39,7 @@ class Meets extends Component {
   };
 
   render() {
-    const { meets, selected, selectEntity } = this.props;
+    const { meets, selected, selectEntity, edit } = this.props;
     const { newEntity } = this.state;
     return (
       <Panel defaultExpanded>
@@ -48,37 +48,39 @@ class Meets extends Component {
         </Panel.Heading>
         <Panel.Collapse>
           <ListGroup>
-            <ListGroupItem>
-              <form className="new-meet" onSubmit={this.addMeet}>
-                <FormControl
-                  className="new-meet-name"
-                  type="text"
-                  value={newEntity.name}
-                  name="name"
-                  placeholder="Enter Meet Name"
-                  onChange={this.handleChange}
-                  data-object="newEntity"
-                  autoComplete="off"
-                />
-                <FormControl
-                  className="new-meet-date"
-                  type="text"
-                  value={newEntity.date}
-                  name="date"
-                  placeholder="Enter Meet Date"
-                  onChange={this.handleChange}
-                  data-object="newEntity"
-                  autoComplete="off"
-                />
-                <Button
-                  className="new-meet-submit"
-                  bsStyle="primary"
-                  type="submit"
-                >
-                  add meet
-                </Button>
-              </form>
-            </ListGroupItem>
+            {edit && (
+              <ListGroupItem>
+                <form className="new-meet" onSubmit={this.addMeet}>
+                  <FormControl
+                    className="new-meet-name"
+                    type="text"
+                    value={newEntity.name}
+                    name="name"
+                    placeholder="Enter Meet Name"
+                    onChange={this.handleChange}
+                    data-object="newEntity"
+                    autoComplete="off"
+                  />
+                  <FormControl
+                    className="new-meet-date"
+                    type="text"
+                    value={newEntity.date}
+                    name="date"
+                    placeholder="Enter Meet Date"
+                    onChange={this.handleChange}
+                    data-object="newEntity"
+                    autoComplete="off"
+                  />
+                  <Button
+                    className="new-meet-submit"
+                    bsStyle="primary"
+                    type="submit"
+                  >
+                    add meet
+                  </Button>
+                </form>
+              </ListGroupItem>
+            )}
             {Object.keys(meets)
               .map(key => meets[key])
               .map(meet => (

@@ -36,7 +36,8 @@ class Participants extends Component {
       addEntity,
       events,
       competitors,
-      editEntity
+      editEntity,
+      edit
     } = this.props;
     const participants = events.reduce((acc, event) => {
       acc = [...acc, ...event.participants];
@@ -85,56 +86,66 @@ class Participants extends Component {
                                   id="meet-menu"
                                   title={participantsByCompetitor[key].name}
                                 >
-                                  <MenuItem
-                                    key="edit-participants"
-                                    onSelect={() =>
-                                      this.showEditParticipantsModal(true, key)
-                                    }
-                                  >
-                                    Edit
-                                  </MenuItem>
-                                  {events
-                                    .filter(
-                                      event =>
-                                        !event.participants
-                                          .map(p => p.competitor)
-                                          .includes(participant.competitor)
-                                    )
-                                    .map(event => (
-                                      <MenuItem
-                                        key={event.id}
-                                        eventKey={event.id}
-                                        onSelect={() =>
-                                          addEntity(PARTICIPANT, {
-                                            competitor: key,
-                                            event: event.id,
-                                            meet: event.meet,
-                                            division:
-                                              participantsByCompetitor[key]
-                                                .division
-                                          })
-                                        }
-                                      >
-                                        Enter {event.name}
-                                      </MenuItem>
-                                    ))}
+                                  {edit && (
+                                    <MenuItem
+                                      key="edit-participants"
+                                      onSelect={() =>
+                                        this.showEditParticipantsModal(
+                                          true,
+                                          key
+                                        )
+                                      }
+                                    >
+                                      Edit
+                                    </MenuItem>
+                                  )}
+                                  {edit &&
+                                    events
+                                      .filter(
+                                        event =>
+                                          !event.participants
+                                            .map(p => p.competitor)
+                                            .includes(participant.competitor)
+                                      )
+                                      .map(event => (
+                                        <MenuItem
+                                          key={event.id}
+                                          eventKey={event.id}
+                                          onSelect={() =>
+                                            addEntity(PARTICIPANT, {
+                                              competitor: key,
+                                              event: event.id,
+                                              meet: event.meet,
+                                              division:
+                                                participantsByCompetitor[key]
+                                                  .division
+                                            })
+                                          }
+                                        >
+                                          Enter {event.name}
+                                        </MenuItem>
+                                      ))}
                                   <MenuItem divider />
-                                  {participants
-                                    .filter(
-                                      participant =>
-                                        participant.competitor === key
-                                    )
-                                    .map(participant => (
-                                      <MenuItem
-                                        key={participant.id}
-                                        eventKey={participant.id}
-                                        onSelect={() =>
-                                          deleteEntity(PARTICIPANT, participant)
-                                        }
-                                      >
-                                        withdraw from {participant.event_name}
-                                      </MenuItem>
-                                    ))}
+                                  {edit &&
+                                    participants
+                                      .filter(
+                                        participant =>
+                                          participant.competitor === key
+                                      )
+                                      .map(participant => (
+                                        <MenuItem
+                                          key={participant.id}
+                                          eventKey={participant.id}
+                                          onSelect={() =>
+                                            deleteEntity(
+                                              PARTICIPANT,
+                                              participant
+                                            )
+                                          }
+                                        >
+                                          withdraw from {participant.event_name}
+                                        </MenuItem>
+                                      ))}
                                 </DropdownButton>
                               </td>
                             </React.Fragment>
@@ -147,12 +158,14 @@ class Participants extends Component {
                             </React.Fragment>
                           )}
                           {<td>{participant.event_name}</td>}
-                          <td>
-                            <AddResultForm
-                              addEntity={addEntity}
-                              participant={participant}
-                            />
-                          </td>
+                          {edit && (
+                            <td>
+                              <AddResultForm
+                                addEntity={addEntity}
+                                participant={participant}
+                              />
+                            </td>
+                          )}
                           {participant.results.map(result => (
                             <td key={result.id}>
                               <DropdownButton
@@ -170,12 +183,16 @@ class Participants extends Component {
                                     : moment.duration(result.time).asSeconds()
                                 }
                               >
-                                <MenuItem
-                                  onSelect={() => deleteEntity(RESULT, result)}
-                                  eventKey="1"
-                                >
-                                  delete
-                                </MenuItem>
+                                {edit && (
+                                  <MenuItem
+                                    onSelect={() =>
+                                      deleteEntity(RESULT, result)
+                                    }
+                                    eventKey="1"
+                                  >
+                                    delete
+                                  </MenuItem>
+                                )}
                               </DropdownButton>
                             </td>
                           ))}

@@ -96,14 +96,7 @@ class Signin extends Component {
       );
       return acc;
     }, []);
-    const {
-      newParticipantDivision,
-      newParticipantCompetitor,
-      selectedCompetitor
-    } = this.state;
-    // const registeredCompetitorKeys = Object.keys(participants).map(
-    //   key => participants[key].competitor
-    // );
+    const { newParticipantDivision, selectedCompetitor } = this.state;
     const unregisteredCompetitors = Object.keys(competitors)
       .filter(key => !registeredCompetitorKeys.includes(key))
       .map(key => competitors[key])

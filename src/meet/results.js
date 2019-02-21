@@ -34,76 +34,82 @@ class Results extends Component {
                       <Panel.Title>{event.name}</Panel.Title>
                     </Panel.Heading>
                     <Table>
-                      {Object.keys(event.divisions).map(key => {
-                        return (
-                          <React.Fragment key={key}>
-                            <thead>
-                              <tr>
-                                <th>{key}</th>
-                                <th>total</th>
-                              </tr>
-                            </thead>
-                            {event.divisions[key]
-                              .sort(
-                                (a, b) =>
-                                  moment
-                                    .duration(a.total_time)
-                                    .asMilliseconds() -
-                                  moment.duration(b.total_time).asMilliseconds()
-                              )
-                              .map(participant => {
-                                return (
-                                  <tbody key={participant.id}>
-                                    <tr>
-                                      <td>
-                                        {
-                                          competitors[participant.competitor]
-                                            .name
-                                        }
-                                      </td>
-                                      <td>
-                                        {moment
-                                          .duration(participant.total_time)
-                                          .asMinutes() > 1
-                                          ? moment
-                                              .utc(
-                                                moment
-                                                  .duration(
-                                                    participant.total_time
-                                                  )
-                                                  .as('milliseconds')
-                                              )
-                                              .format('m:ss.SS')
-                                          : moment
-                                              .duration(participant.total_time)
-                                              .asSeconds()}
-                                      </td>
-                                      {participant.results.map(result => {
-                                        return (
-                                          <td key={result.id}>
-                                            {moment
-                                              .duration(result.time)
-                                              .asMinutes() > 1
-                                              ? moment
-                                                  .utc(
-                                                    moment
-                                                      .duration(result.time)
-                                                      .as('milliseconds')
-                                                  )
-                                                  .format('m:ss.SS')
-                                              : moment
-                                                  .duration(result.time)
-                                                  .asSeconds()}
-                                          </td>
-                                        );
-                                      })}
-                                    </tr>
-                                  </tbody>
-                                );
-                              })}
-                          </React.Fragment>
-                        );
-                      })}
+                      {Object.keys(event.divisions)
+                        .map(key => event.divisions[key])
+                        .map(division => {
+                          return (
+                            <React.Fragment key={division}>
+                              <thead>
+                                <tr>
+                                  <th>{division}</th>
+                                  <th>total</th>
+                                </tr>
+                              </thead>
+                              {division
+                                .sort(
+                                  (a, b) =>
+                                    moment
+                                      .duration(a.total_time)
+                                      .asMilliseconds() -
+                                    moment
+                                      .duration(b.total_time)
+                                      .asMilliseconds()
+                                )
+                                .map(participant => {
+                                  return (
+                                    <tbody key={participant.id}>
+                                      <tr>
+                                        <td>
+                                          {
+                                            competitors[participant.competitor]
+                                              .name
+                                          }
+                                        </td>
+                                        <td>
+                                          {moment
+                                            .duration(participant.total_time)
+                                            .asMinutes() > 1
+                                            ? moment
+                                                .utc(
+                                                  moment
+                                                    .duration(
+                                                      participant.total_time
+                                                    )
+                                                    .as('milliseconds')
+                                                )
+                                                .format('m:ss.SS')
+                                            : moment
+                                                .duration(
+                                                  participant.total_time
+                                                )
+                                                .asSeconds()}
+                                        </td>
+                                        {participant.results.map(result => {
+                                          return (
+                                            <td key={result.id}>
+                                              {moment
+                                                .duration(result.time)
+                                                .asMinutes() > 1
+                                                ? moment
+                                                    .utc(
+                                                      moment
+                                                        .duration(result.time)
+                                                        .as('milliseconds')
+                                                    )
+                                                    .format('m:ss.SS')
+                                                : moment
+                                                    .duration(result.time)
+                                                    .asSeconds()}
+                                            </td>
+                                          );
+                                        })}
+                                      </tr>
+                                    </tbody>
+                                  );
+                                })}
+                            </React.Fragment>
+                          );
+                        })}
                     </Table>
                   </Panel>
                 </Col>

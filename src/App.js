@@ -4,6 +4,7 @@ import Meets from './meets/';
 import Meet from './meet/';
 import Competitors from './competitors/';
 import Competitor from './competitor/';
+import queryString from 'query-string';
 
 export const MEET = 'ENTITY/MEET';
 export const EVENT = 'ENTITY/EVENT';
@@ -20,11 +21,14 @@ class App extends Component {
       meets: {},
       competitors: {},
       areMeetsLoaded: false,
-      areCompetitorsLoaded: false
+      areCompetitorsLoaded: false,
+      edit: false
     };
   }
 
   componentDidMount() {
+    const parsed = queryString.parse(window.location.search);
+    this.setState({ edit: parsed.edit === 'true' });
     fetch(api_url + '/meets')
       .then(res => res.json())
       .then(result => {
@@ -487,7 +491,8 @@ class App extends Component {
       competitors,
       selected,
       areMeetsLoaded,
-      areCompetitorsLoaded
+      areCompetitorsLoaded,
+      edit
     } = this.state;
     const selectedMeet = meets[selected.meet] ? meets[selected.meet] : {};
     const selectedCompetitor = competitors[selected.competitor];
@@ -510,6 +515,7 @@ class App extends Component {
                   selectEntity={this.selectEntity}
                   addEntity={this.addEntity}
                   areMeetsLoaded={areMeetsLoaded}
+                  edit={edit}
                 />
               </Col>
             </Row>
@@ -521,6 +527,7 @@ class App extends Component {
                   selected={selected}
                   selectEntity={this.selectEntity}
                   areCompetitorsLoaded={areCompetitorsLoaded}
+                  edit={edit}
                 />
               </Col>
             </Row>
@@ -535,12 +542,14 @@ class App extends Component {
                 addEntity={this.addEntity}
                 deleteEntity={this.deleteEntity}
                 editEntity={this.editEntity}
+                edit={edit}
               />
             )}
             {selected.competitor && (
               <Competitor
                 competitor={selectedCompetitor}
                 editEntity={this.editEntity}
+                edit={edit}
               />
             )}
           </Col>
