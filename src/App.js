@@ -34,7 +34,7 @@ class App extends Component {
       selected: selected ? selected : {},
       edit: parsed.edit === 'true'
     });
-    if (selected.meet) {
+    if (selected && selected.meet) {
       fetch(api_url + '/meets/' + selected.meet)
         .then(res => res.json())
         .then(meet => {
