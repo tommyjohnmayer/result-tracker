@@ -7,6 +7,7 @@ import {
   Panel
 } from 'react-bootstrap';
 import { COMPETITOR } from '../App';
+import Loader from 'react-loader-spinner';
 
 class Competitors extends Component {
   constructor(props) {
@@ -38,7 +39,7 @@ class Competitors extends Component {
   };
 
   render() {
-    const { competitors, selected, selectEntity, edit } = this.props;
+    const { competitors, selected, selectEntity, edit, loaded } = this.props;
     const { newCompetitor } = this.state;
     return (
       <Panel defaultExpanded>
@@ -47,6 +48,16 @@ class Competitors extends Component {
         </Panel.Heading>
         <Panel.Collapse>
           <ListGroup>
+            {!loaded && (
+              <ListGroupItem>
+                <Loader
+                  type="Ball-Triangle"
+                  color="#286090"
+                  height="80"
+                  width="100%"
+                />
+              </ListGroupItem>
+            )}
             {edit && (
               <ListGroupItem>
                 <form className="new-competitor" onSubmit={this.addCompetitor}>

@@ -7,6 +7,7 @@ import {
   Panel
 } from 'react-bootstrap';
 import { MEET } from '../App';
+import Loader from 'react-loader-spinner';
 
 class Meets extends Component {
   constructor(props) {
@@ -39,7 +40,7 @@ class Meets extends Component {
   };
 
   render() {
-    const { meets, selected, selectEntity, edit } = this.props;
+    const { meets, selected, selectEntity, edit, loaded } = this.props;
     const { newEntity } = this.state;
     return (
       <Panel defaultExpanded>
@@ -48,6 +49,16 @@ class Meets extends Component {
         </Panel.Heading>
         <Panel.Collapse>
           <ListGroup>
+            {!loaded && (
+              <ListGroupItem>
+                <Loader
+                  type="Ball-Triangle"
+                  color="#286090"
+                  height="80"
+                  width="100%"
+                />
+              </ListGroupItem>
+            )}
             {edit && (
               <ListGroupItem>
                 <form className="new-meet" onSubmit={this.addMeet}>

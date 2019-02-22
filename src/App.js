@@ -22,13 +22,28 @@ class App extends Component {
       competitors: {},
       areMeetsLoaded: false,
       areCompetitorsLoaded: false,
+      isMeetLoaded: false,
       edit: false
     };
   }
 
   componentDidMount() {
     const parsed = queryString.parse(window.location.search);
-    this.setState({ edit: parsed.edit === 'true' });
+    const selected = JSON.parse(localStorage.getItem('selected'));
+    this.setState({
+      selected: selected ? selected : {},
+      edit: parsed.edit === 'true'
+    });
+    if (selected.meet) {
+      fetch(api_url + '/meets/' + selected.meet)
+        .then(res => res.json())
+        .then(meet => {
+          this.setState(prevState => ({
+            meets: { ...prevState.meets, [meet.id]: meet },
+            isMeetLoaded: true
+          }));
+        });
+    }
     fetch(api_url + '/meets')
       .then(res => res.json())
       .then(result => {
@@ -72,11 +87,15 @@ class App extends Component {
   getEntity = (type, entity) => {
     switch (type) {
       case MEET:
+        this.setState({
+          isMeetLoaded: false
+        });
         fetch(api_url + '/meets/' + entity.id)
           .then(res => res.json())
           .then(meet => {
             this.setState(prevState => ({
-              meets: { ...prevState.meets, [meet.id]: meet }
+              meets: { ...prevState.meets, [meet.id]: meet },
+              isMeetLoaded: true
             }));
           });
         break;
@@ -480,8 +499,11 @@ class App extends Component {
   };
 
   selectEntity = (type, id) => {
+    const { meets } = this.state;
     switch (type) {
       case MEET:
+        const meet = meets[id];
+        this.getEntity(MEET, meet);
         this.setState({
           selected: { meet: id }
         });
@@ -509,6 +531,7 @@ class App extends Component {
       selected,
       areMeetsLoaded,
       areCompetitorsLoaded,
+      isMeetLoaded,
       edit
     } = this.state;
     const selectedMeet = meets[selected.meet] ? meets[selected.meet] : {};
@@ -531,7 +554,7 @@ class App extends Component {
                   selected={selected}
                   selectEntity={this.selectEntity}
                   addEntity={this.addEntity}
-                  areMeetsLoaded={areMeetsLoaded}
+                  loaded={areMeetsLoaded}
                   edit={edit}
                 />
               </Col>
@@ -543,7 +566,7 @@ class App extends Component {
                   addEntity={this.addEntity}
                   selected={selected}
                   selectEntity={this.selectEntity}
-                  areCompetitorsLoaded={areCompetitorsLoaded}
+                  loaded={areCompetitorsLoaded}
                   edit={edit}
                 />
               </Col>
@@ -561,6 +584,7 @@ class App extends Component {
                 editEntity={this.editEntity}
                 edit={edit}
                 getEntity={this.getEntity}
+                loaded={isMeetLoaded}
               />
             )}
             {selected.competitor && (

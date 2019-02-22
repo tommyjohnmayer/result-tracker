@@ -6,7 +6,7 @@ import { MEET } from '../App';
 class Results extends Component {
   render() {
     const { competitors, getEntity, meet } = this.props;
-    const { events } = meet;
+    const { events = [] } = meet;
     const eventsWithParticipantsByDivision = events.map(event => {
       event.divisions = event.participants.reduce((acc, participant) => {
         if (!acc[participant.division]) {

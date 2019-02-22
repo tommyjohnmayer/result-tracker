@@ -5,6 +5,7 @@ import {
   DropdownButton,
   FormControl,
   Glyphicon,
+  ListGroupItem,
   MenuItem,
   Modal,
   Panel,
@@ -16,6 +17,7 @@ import Events from './events';
 import Participants from './participants';
 import Event from './event';
 import Results from './results';
+import Loader from 'react-loader-spinner';
 
 class Meet extends Component {
   constructor(props) {
@@ -60,9 +62,10 @@ class Meet extends Component {
       editEntity,
       addEntity,
       edit,
-      getEntity
+      getEntity,
+      loaded
     } = this.props;
-    const { events } = meet;
+    const { events = [] } = meet;
     document.title = meet.name;
     const { editMeetModalVisible, updateMeet } = this.state;
     const selectedEvent = events.filter(
@@ -102,52 +105,64 @@ class Meet extends Component {
           </Panel.Title>
         </Panel.Heading>
         <Panel.Body>
-          <Row>
-            <Col sm={3}>
-              {edit && (
-                <Signin
+          {!loaded && (
+            <ListGroupItem>
+              <Loader
+                type="Ball-Triangle"
+                color="#286090"
+                height="80"
+                width="100%"
+              />
+            </ListGroupItem>
+          )}
+          {loaded && (
+            <Row>
+              <Col sm={3}>
+                {edit && (
+                  <Signin
+                    events={events}
+                    addEntity={addEntity}
+                    selected={selected}
+                    competitors={competitors}
+                  />
+                )}
+                <Events
                   events={events}
-                  addEntity={addEntity}
+                  selectEntity={selectEntity}
                   selected={selected}
-                  competitors={competitors}
-                />
-              )}
-              <Events
-                events={events}
-                selectEntity={selectEntity}
-                selected={selected}
-                addEntity={addEntity}
-                edit={edit}
-              />
-            </Col>
-            <Col sm={9}>
-              {selected.event && (
-                <Event
-                  competitors={competitors}
                   addEntity={addEntity}
-                  deleteEntity={deleteEntity}
-                  editEntity={editEntity}
-                  event={selectedEvent}
                   edit={edit}
                 />
-              )}
-              {!selected.event && (
-                <Participants
-                  deleteEntity={deleteEntity}
-                  addEntity={addEntity}
-                  editEntity={editEntity}
-                  events={events}
+              </Col>
+              <Col sm={9}>
+                {selected.event && (
+                  <Event
+                    competitors={competitors}
+                    addEntity={addEntity}
+                    deleteEntity={deleteEntity}
+                    editEntity={editEntity}
+                    event={selectedEvent}
+                    edit={edit}
+                  />
+                )}
+                {!selected.event && (
+                  <Participants
+                    deleteEntity={deleteEntity}
+                    addEntity={addEntity}
+                    editEntity={editEntity}
+                    events={events}
+                    competitors={competitors}
+                    edit={edit}
+                  />
+                )}
+                <Results
                   competitors={competitors}
-                  edit={edit}
+                  getEntity={getEntity}
+                  meet={meet}
                 />
-              )}
-              <Results
-                competitors={competitors}
-                getEntity={getEntity}
-                meet={meet}
-              />
-            </Col>
-          </Row>
+              </Col>
+            </Row>
+          )}
         </Panel.Body>
         <Modal
           show={editMeetModalVisible}
