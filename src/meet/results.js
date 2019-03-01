@@ -1,23 +1,57 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Button, Col, Glyphicon, Panel, Row, Table } from 'react-bootstrap';
-import { MEET } from '../App';
+import { Col, FormControl, Panel, Row, Table } from 'react-bootstrap';
+import { DNF } from '../App';
 
 class Results extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      filterValue: ''
+    };
+  }
+
+  updateFilter = event => {
+    this.setState({
+      filterValue: event.target.value
+    });
+  };
+
   render() {
-    const { competitors, getEntity, meet } = this.props;
+    const { filterValue } = this.state;
+    const { competitors, meet } = this.props;
     const { events = [] } = meet;
     const eventsWithParticipantsByDivision = events.map(event => {
-      event.divisions = event.participants.reduce((acc, participant) => {
-        if (!acc[participant.division]) {
-          acc[participant.division] = [];
-        }
-        participant.total_time = participant.results.reduce((rAcc, result) => {
-          return rAcc.add(moment.duration(result.time));
-        }, moment.duration(0));
-        acc[participant.division].push(participant);
-        return acc;
-      }, {});
+      event.divisions = event.participants
+        .filter(participant => {
+          if (filterValue.trim() === '') {
+            return true;
+          }
+          return (
+            participant.division
+              .toLowerCase()
+              .includes(filterValue.toLowerCase()) ||
+            competitors[participant.competitor].name
+              .toLowerCase()
+              .includes(filterValue.toLowerCase())
+          );
+        })
+        .reduce((acc, participant) => {
+          if (!acc[participant.division]) {
+            acc[participant.division] = [];
+          }
+          participant.total_time = participant.results.reduce(
+            (rAcc, result) => {
+              if (rAcc === DNF || result.time === DNF) {
+                return DNF;
+              }
+              return rAcc.add(moment.duration(result.time));
+            },
+            moment.duration(0)
+          );
+          acc[participant.division].push(participant);
+          return acc;
+        }, {});
 
       return event;
     });
@@ -26,9 +60,20 @@ class Results extends Component {
         <Panel.Heading>
           <Panel.Title>
             Results&nbsp;
-            <Button bsStyle="default" onClick={() => getEntity(MEET, meet)}>
-              <Glyphicon glyph="refresh" />
-            </Button>
+            <form
+              onSubmit={event => {
+                event.preventDefault();
+              }}
+            >
+              <FormControl
+                type="text"
+                value={filterValue}
+                name="filter"
+                placeholder="Filter..."
+                autoComplete="off"
+                onChange={this.updateFilter}
+              />
+            </form>
           </Panel.Title>
         </Panel.Heading>
         <Panel.Body>
@@ -50,16 +95,25 @@ class Results extends Component {
                               <tr>
                                 <th>{results[0].division}</th>
                                 <th>total</th>
+                                <td>run 1</td>
+                                <td>run 2</td>
                               </tr>
                             </thead>
                             {results
-                              .sort(
-                                (a, b) =>
+                              .sort((a, b) => {
+                                if (a.total_time === DNF) {
+                                  return 1;
+                                }
+                                if (b.total_time === DNF) {
+                                  return -1;
+                                }
+                                return (
                                   moment
                                     .duration(a.total_time)
                                     .asMilliseconds() -
                                   moment.duration(b.total_time).asMilliseconds()
-                              )
+                                );
+                              })
                               .map(participant => {
                                 return (
                                   <tbody key={participant.id}>
@@ -70,10 +124,12 @@ class Results extends Component {
                                             .name
                                         }
                                       </td>
-                                      <td>
-                                        {moment
-                                          .duration(participant.total_time)
-                                          .asMinutes() > 1
+                                      <th>
+                                        {participant.total_time === DNF
+                                          ? DNF
+                                          : moment
+                                              .duration(participant.total_time)
+                                              .asMinutes() > 1
                                           ? moment
                                               .utc(
                                                 moment
@@ -86,13 +142,15 @@ class Results extends Component {
                                           : moment
                                               .duration(participant.total_time)
                                               .asSeconds()}
-                                      </td>
+                                      </th>
                                       {participant.results.map(result => {
                                         return (
                                           <td key={result.id}>
-                                            {moment
-                                              .duration(result.time)
-                                              .asMinutes() > 1
+                                            {result.time === DNF
+                                              ? DNF
+                                              : moment
+                                                  .duration(result.time)
+                                                  .asMinutes() > 1
                                               ? moment
                                                   .utc(
                                                     moment

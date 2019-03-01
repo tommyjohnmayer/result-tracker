@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
-import { DropdownButton, MenuItem, Modal, Panel, Table } from 'react-bootstrap';
-import { PARTICIPANT, RESULT } from '../App';
+import {
+  DropdownButton,
+  FormControl,
+  MenuItem,
+  Modal,
+  Panel,
+  Table
+} from 'react-bootstrap';
+import { DNF, PARTICIPANT, RESULT } from '../App';
 import moment from 'moment';
 import AddResultForm from './addResultForm';
 import EditParticipantForm from './editParticipantForm';
@@ -10,9 +17,16 @@ class Participants extends Component {
     super(props);
     this.state = {
       editParticipantsModalVisible: false,
-      participantsToEdit: []
+      participantsToEdit: [],
+      filterValue: ''
     };
   }
+
+  updateFilter = event => {
+    this.setState({
+      filterValue: event.target.value
+    });
+  };
 
   showEditParticipantsModal = (show, competitor) => {
     const { events } = this.props;
@@ -43,12 +57,29 @@ class Participants extends Component {
       acc = [...acc, ...event.participants];
       return acc;
     }, []);
-    const { editParticipantsModalVisible, participantsToEdit } = this.state;
+    const {
+      editParticipantsModalVisible,
+      participantsToEdit,
+      filterValue
+    } = this.state;
     const participantsByCompetitor = events
       .reduce((acc, event) => {
         acc = [...acc, ...event.participants];
         return acc;
       }, [])
+      .filter(participant => {
+        if (filterValue.trim() === '') {
+          return true;
+        }
+        return (
+          participant.division
+            .toLowerCase()
+            .includes(filterValue.toLowerCase()) ||
+          competitors[participant.competitor].name
+            .toLowerCase()
+            .includes(filterValue.toLowerCase())
+        );
+      })
       .reduce((acc, participant) => {
         if (!acc[participant.competitor]) {
           const competitor = competitors[participant.competitor];
@@ -68,6 +99,20 @@ class Participants extends Component {
       <Panel defaultExpanded>
         <Panel.Heading>
           <Panel.Title>Participants</Panel.Title>
+          <form
+            onSubmit={event => {
+              event.preventDefault();
+            }}
+          >
+            <FormControl
+              type="text"
+              value={filterValue}
+              name="filter"
+              placeholder="Filter..."
+              autoComplete="off"
+              onChange={this.updateFilter}
+            />
+          </form>
         </Panel.Heading>
         <Table condensed>
           {Object.keys(participantsByCompetitor).map(key => {
@@ -172,7 +217,10 @@ class Participants extends Component {
                                 bsStyle="link"
                                 id="meet-menu"
                                 title={
-                                  moment.duration(result.time).asMinutes() > 1
+                                  result.time === DNF
+                                    ? DNF
+                                    : moment.duration(result.time).asMinutes() >
+                                      1
                                     ? moment
                                         .utc(
                                           moment

@@ -9,7 +9,7 @@ import {
   Panel,
   Table
 } from 'react-bootstrap';
-import { EVENT, PARTICIPANT, RESULT } from '../App';
+import { DNF, EVENT, PARTICIPANT, RESULT } from '../App';
 import moment from 'moment';
 import RunOrderModal from './runOrderModal';
 import AddResultForm from './addResultForm';
@@ -20,9 +20,16 @@ class Participants extends Component {
     this.state = {
       editEventModalVisible: false,
       editRunOrderModalVisible: false,
-      updateEvent: {}
+      updateEvent: {},
+      filterValue: ''
     };
   }
+
+  updateFilter = event => {
+    this.setState({
+      filterValue: event.target.value
+    });
+  };
 
   editParticipant = participant => {
     const { editEntity } = this.props;
@@ -66,7 +73,8 @@ class Participants extends Component {
     const {
       editEventModalVisible,
       editRunOrderModalVisible,
-      updateEvent
+      updateEvent,
+      filterValue
     } = this.state;
     return (
       <Panel defaultExpanded>
@@ -102,12 +110,39 @@ class Participants extends Component {
                 </MenuItem>
               </DropdownButton>
             )}
+            <form
+              onSubmit={event => {
+                event.preventDefault();
+              }}
+            >
+              <FormControl
+                type="text"
+                value={filterValue}
+                name="filter"
+                placeholder="Filter..."
+                autoComplete="off"
+                onChange={this.updateFilter}
+              />
+            </form>
           </Panel.Title>
         </Panel.Heading>
         <Table condensed>
           <tbody>
             {event.participants
               .sort((a, b) => a.order - b.order)
+              .filter(participant => {
+                if (filterValue.trim() === '') {
+                  return true;
+                }
+                return (
+                  participant.division
+                    .toLowerCase()
+                    .includes(filterValue.toLowerCase()) ||
+                  competitors[participant.competitor].name
+                    .toLowerCase()
+                    .includes(filterValue.toLowerCase())
+                );
+              })
               .map(participant => (
                 <tr key={participant.id}>
                   <td>
@@ -144,7 +179,9 @@ class Participants extends Component {
                             bsStyle="link"
                             id="meet-menu"
                             title={
-                              moment.duration(result.time).asMinutes() > 1
+                              result.time === DNF
+                                ? DNF
+                                : moment.duration(result.time).asMinutes() > 1
                                 ? moment
                                     .utc(
                                       moment

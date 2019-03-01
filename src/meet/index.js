@@ -56,7 +56,7 @@ class Meet extends Component {
     const {
       deleteEntity,
       meet = {},
-      competitors,
+      competitors = {},
       selectEntity,
       selected,
       editEntity,
@@ -117,25 +117,25 @@ class Meet extends Component {
           )}
           {loaded && (
             <Row>
-              <Col sm={3}>
-                {edit && (
+              {edit && (
+                <Col sm={3}>
                   <Signin
                     events={events}
                     addEntity={addEntity}
                     selected={selected}
                     competitors={competitors}
                   />
-                )}
-                <Events
-                  events={events}
-                  selectEntity={selectEntity}
-                  selected={selected}
-                  addEntity={addEntity}
-                  edit={edit}
-                />
-              </Col>
-              <Col sm={9}>
-                {selected.event && (
+                  <Events
+                    events={events}
+                    selectEntity={selectEntity}
+                    selected={selected}
+                    addEntity={addEntity}
+                    edit={edit}
+                  />
+                </Col>
+              )}
+              <Col sm={edit ? 9 : 12}>
+                {edit && selected.event && (
                   <Event
                     competitors={competitors}
                     addEntity={addEntity}
@@ -145,7 +145,7 @@ class Meet extends Component {
                     edit={edit}
                   />
                 )}
-                {!selected.event && (
+                {edit && !selected.event && (
                   <Participants
                     deleteEntity={deleteEntity}
                     addEntity={addEntity}
@@ -155,11 +155,7 @@ class Meet extends Component {
                     edit={edit}
                   />
                 )}
-                <Results
-                  competitors={competitors}
-                  getEntity={getEntity}
-                  meet={meet}
-                />
+                <Results competitors={competitors} meet={meet} />
               </Col>
             </Row>
           )}

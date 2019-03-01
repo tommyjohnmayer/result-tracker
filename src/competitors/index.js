@@ -13,9 +13,16 @@ class Competitors extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      newCompetitor: { name: '', division: '' }
+      newCompetitor: { name: '', division: '' },
+      filterValue: ''
     };
   }
+
+  updateFilter = event => {
+    this.setState({
+      filterValue: event.target.value
+    });
+  };
 
   handleChange = event => {
     this.setState({
@@ -40,11 +47,25 @@ class Competitors extends Component {
 
   render() {
     const { competitors, selected, selectEntity, edit, loaded } = this.props;
-    const { newCompetitor } = this.state;
+    const { newCompetitor, filterValue } = this.state;
     return (
       <Panel defaultExpanded>
         <Panel.Heading>
           <Panel.Title toggle>Competitors</Panel.Title>
+          <form
+            onSubmit={event => {
+              event.preventDefault();
+            }}
+          >
+            <FormControl
+              type="text"
+              value={filterValue}
+              name="filter"
+              placeholder="Filter..."
+              autoComplete="off"
+              onChange={this.updateFilter}
+            />
+          </form>
         </Panel.Heading>
         <Panel.Collapse>
           <ListGroup>
@@ -93,7 +114,21 @@ class Competitors extends Component {
             )}
             {Object.keys(competitors)
               .map(key => competitors[key])
+              .filter(competitor => {
+                if (filterValue.trim() === '') {
+                  return true;
+                }
+                return (
+                  competitor.division
+                    .toLowerCase()
+                    .includes(filterValue.toLowerCase()) ||
+                  competitor.name
+                    .toLowerCase()
+                    .includes(filterValue.toLowerCase())
+                );
+              })
               .sort((a, b) => a.name.localeCompare(b.name))
+              .slice(0, 12)
               .map(competitor => (
                 <ListGroupItem
                   className="competitor-selector"

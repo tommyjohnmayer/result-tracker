@@ -28,11 +28,10 @@ class Meets extends Component {
 
   addMeet = event => {
     event.preventDefault();
-    const { addEntity, selectEntity } = this.props;
+    const { addEntity } = this.props;
     const { newEntity } = this.state;
     if (newEntity.name.trim() !== '') {
-      const meetId = addEntity(MEET, newEntity);
-      selectEntity(MEET, meetId);
+      addEntity(MEET, newEntity);
       this.setState({
         newEntity: { name: '', date: '' }
       });
@@ -94,6 +93,7 @@ class Meets extends Component {
             )}
             {Object.keys(meets)
               .map(key => meets[key])
+              .sort((a, b) => b.date.localeCompare(a.date))
               .map(meet => (
                 <ListGroupItem
                   className="meet-selector"

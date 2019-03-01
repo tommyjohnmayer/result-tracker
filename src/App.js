@@ -11,6 +11,8 @@ export const EVENT = 'ENTITY/EVENT';
 export const COMPETITOR = 'ENTITY/COMPETITOR';
 export const PARTICIPANT = 'ENTITY/PARTICIPANT';
 export const RESULT = 'ENTITY/RESULT';
+export const DNF = 'DNS/DNF';
+
 const api_url = 'https://result-tracker-api.appspot.com';
 
 class App extends Component {
@@ -47,15 +49,25 @@ class App extends Component {
     fetch(api_url + '/meets')
       .then(res => res.json())
       .then(result => {
-        const meets = result._embedded.meets.reduce((acc, meet) => {
-          acc[meet.id] = meet;
-          return acc;
-        }, {});
-        const selected = JSON.parse(localStorage.getItem('selected'));
-        this.setState({
-          meets,
-          areMeetsLoaded: true,
-          selected: selected ? selected : {}
+        this.setState(prevState => {
+          const meets = result._embedded.meets.reduce((acc, meet) => {
+            if (
+              prevState.selected &&
+              prevState.selected.meet &&
+              prevState.meets[prevState.selected.meet]
+            ) {
+              meet = {
+                ...meet,
+                events: prevState.meets[prevState.selected.meet].events
+              };
+            }
+            acc[meet.id] = meet;
+            return acc;
+          }, {});
+          return {
+            meets,
+            areMeetsLoaded: true
+          };
         });
       });
     fetch(api_url + '/competitors')
@@ -342,7 +354,6 @@ class App extends Component {
   addEntity = (type, entity) => {
     switch (type) {
       case MEET:
-        let meetId;
         fetch(api_url + '/meets', {
           method: 'POST',
           headers: {
@@ -357,13 +368,12 @@ class App extends Component {
               meets: {
                 ...prevState.meets,
                 [meet.id]: { ...meet }
-              }
+              },
+              selected: { meet: meet.id }
             }));
-            meetId = meet.id;
           });
-        return meetId;
+        break;
       case EVENT:
-        let eventId;
         fetch(api_url + '/meets/' + entity.meet + '/events', {
           method: 'POST',
           headers: {
@@ -381,11 +391,9 @@ class App extends Component {
                 meets: { ...prevState.meets, [updatedMeet.id]: updatedMeet }
               };
             });
-            eventId = event.id;
           });
-        return eventId;
+        break;
       case PARTICIPANT:
-        let participantId;
         const event = this.state.meets[entity.meet].events.filter(
           event => event.id === entity.event
         )[0];
@@ -425,11 +433,9 @@ class App extends Component {
                 meets: { ...prevState.meets, [updatedMeet.id]: updatedMeet }
               };
             });
-            participantId = participant.id;
           });
-        return participantId;
+        break;
       case RESULT:
-        let resultId;
         fetch(
           api_url +
             '/meets/' +
@@ -468,11 +474,9 @@ class App extends Component {
                 meets: { ...prevState.meets, [updatedMeet.id]: updatedMeet }
               };
             });
-            resultId = result.id;
           });
-        return resultId;
+        break;
       case COMPETITOR:
-        let competitorId;
         fetch(api_url + '/competitors', {
           method: 'POST',
           headers: {
@@ -489,9 +493,8 @@ class App extends Component {
                 [competitor.id]: { ...competitor }
               }
             }));
-            competitorId = competitor.id;
           });
-        return competitorId;
+        break;
       default:
         console.log('operation not supported add', type, entity);
         break;
@@ -560,16 +563,18 @@ class App extends Component {
               </Col>
             </Row>
             <Row>
-              <Col sm={12}>
-                <Competitors
-                  competitors={competitors}
-                  addEntity={this.addEntity}
-                  selected={selected}
-                  selectEntity={this.selectEntity}
-                  loaded={areCompetitorsLoaded}
-                  edit={edit}
-                />
-              </Col>
+              {edit && (
+                <Col sm={12}>
+                  <Competitors
+                    competitors={competitors}
+                    addEntity={this.addEntity}
+                    selected={selected}
+                    selectEntity={this.selectEntity}
+                    loaded={areCompetitorsLoaded}
+                    edit={edit}
+                  />
+                </Col>
+              )}
             </Row>
           </Col>
           <Col sm={9}>
@@ -584,7 +589,7 @@ class App extends Component {
                 editEntity={this.editEntity}
                 edit={edit}
                 getEntity={this.getEntity}
-                loaded={isMeetLoaded}
+                loaded={isMeetLoaded && areCompetitorsLoaded}
               />
             )}
             {selected.competitor && (
